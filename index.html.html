@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>特殊事务调查局档案系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .logo-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .search-area {
+            display: flex;
+            width: 100%;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 1rem;
+            min-height: 44px;
+        }
+        
+        .search-btn {
+            padding: 0 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            min-width: 60px;
+            min-height: 44px;
+        }
+        
+        .user-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .auth-btn {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            min-height: 44px;
+            flex: 1;
+            max-width: 120px;
+        }
+        
+        .auth-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .auth-btn.logout {
+            background-color: #e74c3c;
+        }
+        
+        .auth-btn.logout:hover {
+            background-color: #c0392b;
+        }
+        
+        .progress-container {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .tab:hover {
+            background-color: #f1f8ff;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            color: #3498db;
+            font-weight: 500;
+        }
+        
+        .content-area {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            padding: 30px 15px;
+        }
+        
+        .welcome-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+        
+        .welcome-text {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            color: #7f8c8d;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .start-btn {
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            min-height: 44px;
+            min-width: 120px;
+        }
+        
+        .start-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .case-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .case-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .case-meta {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .case-description {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .case-status {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        
+        .case-status.open {
+            background-color: #e74c3c;
+        }
+        
+        .case-status.in-progress {
+            background-color: #f39c12;
+        }
+        
+        .case-status.closed {
+            background-color: #27ae60;
+        }
+        
+        .documents-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .document-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .document-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .doc-title {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .doc-meta {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .doc-category {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #e1f0fa;
+            color: #3498db;
+            border-radius: 3px;
+            font-size: 0.75rem;
+        }
+        
+        .new-badge {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .search-results {
+            margin-top: 15px;
+        }
+        
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .result-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .result-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .result-preview {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .keyword {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 2px 4px;
+        }
+        
+        .hotel-map {
+            width: 100%;
+            height: 300px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            position: relative;
+            border: 1px solid #e9ecef;
+        }
+        
+        .hotel-area {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #e1f0fa;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .hotel-area:hover {
+            background-color: #cfe7f7;
+            transform: scale(1.05);
+        }
+        
+        .area-label {
+            font-weight: 500;
+            color: #2c3e50;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+        
+        .classified {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 12px 0;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .password-prompt {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .password-input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 100%;
+            min-height: 44px;
+            margin-bottom: 10px;
+        }
+        
+        .password-hint {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+        
+        .device-simulator {
+            background-color: #2c3e50;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+        
+        .device-content {
+            background-color: #1a2530;
+            padding: 12px;
+            border-radius: 5px;
+            min-height: 150px;
+        }
+        
+        .message {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .message-sent {
+            background-color: #3498db;
+            text-align: right;
+        }
+        
+        .message-received {
+            background-color: #7f8c8d;
+        }
+        
+        .email-list {
+            list-style-type: none;
+        }
+        
+        .email-item {
+            padding: 10px;
+            border-bottom: 1px solid #34495e;
+            cursor: pointer;
+        }
+        
+        .email-item:hover {
+            background-color: #34495e;
+        }
+        
+        .email-subject {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .email-sender {
+            font-size: 0.75rem;
+            color: #bdc3c7;
+        }
+        
+        .document-detail {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .document-detail.active {
+            display: block;
+        }
+        
+        .deduction-form {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .deduction-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 44px;
+            font-size: 1rem;
+        }
+        
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .auth-modal.active {
+            display: flex;
+        }
+        
+        .auth-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .auth-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 44px;
+            font-size: 1rem;
+        }
+        
+        .auth-buttons-modal {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        .auth-buttons-modal .auth-btn {
+            flex: 1;
+            min-height: 44px;
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        /* 平板优化 */
+        @media (min-width: 768px) {
+            .header {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .logo-area {
+                flex: 1;
+            }
+            
+            .search-area {
+                width: auto;
+                flex: 2;
+                margin: 0 20px;
+            }
+            
+            .user-area {
+                flex: 1;
+                align-items: flex-end;
+            }
+            
+            .auth-buttons {
+                justify-content: flex-end;
+            }
+            
+            .hotel-map {
+                height: 400px;
+            }
+            
+            .hotel-area {
+                width: 80px;
+                height: 80px;
+                font-size: 1rem;
+            }
+            
+            .area-label {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* 手机横屏优化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .nav-tabs {
+                margin-bottom: 10px;
+            }
+            
+            .content-area {
+                padding: 15px;
+                margin-bottom: 10px;
+            }
+            
+            .hotel-map {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-area">
+                <div class="logo">特殊事务调查局档案系统</div>
+            </div>
+            
+            <div class="search-area">
+                <input type="text" class="search-input" id="search-input" placeholder="输入关键词搜索档案...">
+                <button class="search-btn" id="search-btn">搜索</button>
+            </div>
+            
+            <div class="user-area">
+                <div class="user-info" id="user-info">登录用户: 新进调查员 | 部门: 特殊事务科</div>
+                <div class="auth-buttons">
+                    <button class="auth-btn" id="login-btn">登录</button>
+                    <button class="auth-btn logout" id="logout-btn" style="display: none;">退出</button>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress" id="progress-bar"></div>
+                    </div>
+                    <div class="progress-text">案件进度: <span id="progress-text">0%</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <div class="tab active" data-page="welcome">首页</div>
+            <div class="tab" data-page="case-intro">案件介绍</div>
+            <div class="tab" data-page="crime-scene">现场勘查</div>
+            <div class="tab" data-page="files">档案浏览</div>
+            <div class="tab" data-page="search">档案搜索</div>
+            <div class="tab" data-page="deduction">推理分析</div>
+        </div>
+        
+        <div class="content-area">
+            <!-- 欢迎页面 -->
+            <div class="page active" id="welcome">
+                <div class="welcome-message">
+                    <div class="welcome-icon">🔍</div>
+                    <h1 class="page-title">欢迎进入特殊事务调查局档案系统</h1>
+                    <p class="welcome-text">
+                        您已成功登录特殊事务调查局内部档案系统。本系统收录了所有特殊案件的详细档案，请谨慎使用您的权限，遵守保密协议。
+                    </p>
+                    <button class="start-btn" id="start-investigation">开始调查</button>
+                </div>
+            </div>
+            
+            <!-- 案件介绍页面 -->
+            <div class="page" id="case-intro">
+                <h1 class="page-title">案件介绍 - 张明远死亡案</h1>
+                
+                <div class="case-card">
+                    <h2 class="case-title">张明远死亡案</h2>
+                    <div class="case-meta">案件编号: ST-2023-047 | 创建日期: 2023-10-15 | 状态: <span class="case-status in-progress">调查中</span></div>
+                    <div class="case-description">
+                        <p>星光电视台台长张明远于2023年10月14日被发现死于皇冠酒店1208房间。初步调查显示死因可疑，已列为特殊案件处理。</p>
+                        <p>死者胸口插有一把匕首，但法医报告显示实际死因为中毒。现场发现多处异常情况，包括奇特的血迹分布模式。</p>
+                    </div>
+                </div>
+                
+                <div class="case-card">
+                    <h2 class="case-title">被害人信息</h2>
+                    <div class="case-description">
+                        <p><strong>姓名：</strong>张明远</p>
+                        <p><strong>年龄：</strong>52岁</p>
+                        <p><strong>身份：</strong>星光电视台台长</p>
+                        <p><strong>社会形象：</strong>业界知名人物，与妻子林婉如结婚十年，无子女，公开场合表现恩爱，是媒体眼中的模范夫妻。</p>
+                    </div>
+                </div>
+                
+                <div class="case-card">
+                    <h2 class="case-title">初步发现</h2>
+                    <div class="case-description">
+                        <p>1. 尸体胸口插有一把匕首，血迹呈喷射状溅到天花板上。</p>
+                        <p>2. 尸体正上方天花板区域无血迹，形成明显空白区域，图案异常。</p>
+                        <p>3. 房间门窗反锁，无强行进入痕迹。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 现场勘查页面 -->
+            <div class="page" id="crime-scene">
+                <h1 class="page-title">现场勘查 - 皇冠酒店1208房间</h1>
+                
+                <div class="case-card">
+                    <h2 class="case-title">现场平面图</h2>
+                    <div class="case-description">
+                        <p>点击房间内的不同区域进行调查：</p>
+                    </div>
+                </div>
+                
+                <div class="hotel-map">
+                    <div class="hotel-area" style="top: 20px; left: 20px;" data-area="body">
+                        <div class="area-label">尸体位置</div>
+                    </div>
+                    <div class="hotel-area" style="top: 20px; left: 50%; transform: translateX(-50%);" data-area="ceiling">
+                        <div class="area-label">天花板血迹</div>
+                    </div>
+                    <div class="hotel-area" style="top: 40%; left: 50%; transform: translate(-50%, -50%);" data-area="desk">
+                        <div class="area-label">书桌</div>
+                    </div>
+                    <div class="hotel-area" style="bottom: 20px; left: 20px;" data-area="window">
+                        <div class="area-label">窗户</div>
+                    </div>
+                    <div class="hotel-area" style="bottom: 20px; right: 20px;" data-area="trash">
+                        <div class="area-label">垃圾桶</div>
+                    </div>
+                    <div class="hotel-area" style="top: 40%; right: 20px;" data-area="bathroom">
+                        <div class="area-label">卫生间</div>
+                    </div>
+                </div>
+                
+                <div id="scene-details">
+                    <p>请点击平面图中的区域进行勘查...</p>
+                </div>
+            </div>
+            
+            <!-- 档案浏览页面 -->
+            <div class="page" id="files">
+                <h1 class="page-title">档案浏览</h1>
+                
+                <div class="documents-list" id="documents-container">
+                    <!-- 档案将通过JS动态添加 -->
+                    <div class="document-item">
+                        <div class="doc-category">案件信息</div>
+                        <h3 class="doc-title">案件通知</h3>
+                        <div class="doc-meta">创建日期: 2023-10-15 | 权限: 公开</div>
+                    </div>
+                    
+                    <div class="document-item">
+                        <div class="doc-category">案件信息</div>
+                        <h3 class="doc-title">张明远死亡案现场报告</h3>
+                        <div class="doc-meta">创建日期: 2023-10-15 | 权限: 公开</div>
+                    </div>
+                </div>
+                
+                <div id="document-detail-container">
+                    <!-- 档案详情将通过JS动态添加 -->
+                </div>
+            </div>
+            
+            <!-- 档案搜索页面 -->
+            <div class="page" id="search">
+                <h1 class="page-title">档案搜索</h1>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" id="search-input-page" placeholder="输入关键词搜索档案...">
+                    <button class="search-btn" id="search-btn-page">搜索</button>
+                </div>
+                
+                <div class="search-results" id="search-results">
+                    <p>请输入关键词搜索相关档案，或尝试点击以下关键词：</p>
+                    <p>
+                        <span class="keyword" data-keyword="张明远">张明远</span> | 
+                        <span class="keyword" data-keyword="血迹">血迹</span> | 
+                        <span class="keyword" data-keyword="法医报告">法医报告</span> |
+                        <span class="keyword" data-keyword="监控">监控</span> |
+                        <span class="keyword" data-keyword="证词">证词</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 推理分析页面 -->
+            <div class="page" id="deduction">
+                <h1 class="page-title">推理分析</h1>
+                
+                <div style="padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                    <p>基于已收集的线索和推理假设，请形成您的最终结论：</p>
+                    <div style="margin-top: 15px;">
+                        <button class="start-btn" id="submit-deduction">提交推理报告</button>
+                    </div>
+                </div>
+                
+                <div class="deduction-form" id="deduction-form">
+                    <h3 style="margin-bottom: 15px;">最终推理 - 请选择您的结论</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">凶手是谁？</label>
+                        <select class="form-select" id="culprit-select">
+                            <option value="">请选择...</option>
+                            <option value="林婉如">林婉如</option>
+                            <option value="李梦">李梦</option>
+                            <option value="白素">白素</option>
+                            <option value="其他人">其他人</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">研究所的性质是什么？</label>
+                        <select class="form-select" id="institute-select">
+                            <option value="">请选择...</option>
+                            <option value="妖怪研究">妖怪研究机构</option>
+                            <option value="生物实验">生物实验机构</option>
+                            <option value="政府秘密">政府秘密机构</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">李梦和林婉如的关系是？</label>
+                        <select class="form-select" id="relationship-select">
+                            <option value="">请选择...</option>
+                            <option value="姐妹">姐妹关系</option>
+                            <option value="替身">替身关系</option>
+                            <option value="无关">没有关系</option>
+                            <option value="其他">其他关系</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <button class="start-btn" id="final-submit">提交最终结论</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            特殊事务调查局内部系统 | 安全等级: 机密 | 最后更新: 2023-10-15
+        </div>
+    </div>
+    
+    <!-- 登录模态框 -->
+    <div class="auth-modal" id="auth-modal">
+        <div class="auth-content">
+            <h2 class="auth-title">系统登录</h2>
+            <input type="text" class="auth-input" id="username-input" placeholder="用户名">
+            <input type="password" class="auth-input" id="password-input" placeholder="密码">
+            <div class="auth-buttons-modal">
+                <button class="auth-btn" id="modal-login-btn">登录</button>
+                <button class="auth-btn logout" id="modal-cancel-btn">取消</button>
+            </div>
+            <div class="password-hint" id="login-hint" style="margin-top: 15px; display: none;">
+                提示：管理员账号信息可在案件档案中找到
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 简化的游戏逻辑 - 实际使用时需要替换为完整逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            // 页面切换
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    const pageId = this.getAttribute('data-page');
+                    document.getElementById(pageId).classList.add('active');
+                });
+            });
+            
+            // 开始调查按钮
+            document.getElementById('start-investigation').addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                
+                document.querySelector('.tab[data-page="case-intro"]').classList.add('active');
+                document.getElementById('case-intro').classList.add('active');
+            });
+            
+            // 现场勘查区域点击
+            document.querySelectorAll('.hotel-area').forEach(area => {
+                area.addEventListener('click', function() {
+                    const areaId = this.getAttribute('data-area');
+                    const areaNames = {
+                        'body': '尸体位置',
+                        'ceiling': '天花板血迹',
+                        'desk': '书桌',
+                        'window': '窗户',
+                        'trash': '垃圾桶',
+                        'bathroom': '卫生间'
+                    };
+                    
+                    const findings = {
+                        'body': '尸体胸口插着一把匕首，血迹呈喷射状。刀柄上没有发现指纹。在尸体旁边发现一部手机。',
+                        'ceiling': '天花板上的血迹分布异常，尸体正上方有一个明显的螺旋状无血迹区域。',
+                        'desk': '书桌上发现工作日志和电视台周年庆方案。工作日志显示张明远近期工作压力大，多次提到"特殊项目"。周年庆方案中有李梦的表演安排。',
+                        'window': '窗户从内部锁着，没有强行进入的痕迹。窗台上有少量灰尘，没有脚印。',
+                        'trash': '垃圾桶里有一个空的安眠药瓶，不是张明远平时服用的品牌。',
+                        'bathroom': '卫生间整洁，没有使用痕迹。在洗手池排水口发现几根长发，已收集作为证据。'
+                    };
+                    
+                    document.getElementById('scene-details').innerHTML = `
+                        <div class="case-card">
+                            <h3 class="case-title">${areaNames[areaId]}调查结果</h3>
+                            <div class="case-description">${findings[areaId]}</div>
+                        </div>
+                    `;
+                });
+            });
+            
+            // 搜索功能
+            document.getElementById('search-btn').addEventListener('click', performSearch);
+            document.getElementById('search-btn-page').addEventListener('click', performSearch);
+            
+            function performSearch() {
+                const searchInput = document.getElementById('search-input').value || 
+                                  document.getElementById('search-input-page').value;
+                
+                if (searchInput.trim() !== '') {
+                    document.getElementById('search-results').innerHTML = `
+                        <p>搜索关键词: <strong>${searchInput}</strong></p>
+                        <div class="result-item">
+                            <div class="result-title">搜索结果示例</div>
+                            <div class="result-preview">这是根据"${searchInput}"搜索到的示例结果。在实际游戏中，这里会显示相关的档案信息。</div>
+                        </div>
+                        <p style="margin-top: 15px;">找到 1 条相关记录</p>
+                    `;
+                    
+                    // 切换到搜索页面
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    document.querySelector('.tab[data-page="search"]').classList.add('active');
+                    document.getElementById('search').classList.add('active');
+                }
+            }
+            
+            // 关键词点击
+            document.querySelectorAll('.keyword').forEach(keyword => {
+                keyword.addEventListener('click', function() {
+                    const searchTerm = this.getAttribute('data-keyword');
+                    document.getElementById('search-input').value = searchTerm;
+                    document.getElementById('search-input-page').value = searchTerm;
+                    performSearch();
+                });
+            });
+            
+            // 档案点击
+            document.querySelectorAll('.document-item').forEach(doc => {
+                doc.addEventListener('click', function() {
+                    const title = this.querySelector('.doc-title').textContent;
+                    const category = this.querySelector('.doc-category').textContent;
+                    
+                    document.getElementById('document-detail-container').innerHTML = `
+                        <div class="document-detail active">
+                            <div class="doc-category">${category}</div>
+                            <h3 class="doc-title">${title}</h3>
+                            <div class="doc-meta">创建日期: 2023-10-15 | 权限: 内部</div>
+                            <div class="doc-content">
+                                <p>这是${title}的详细内容。在实际游戏中，这里会显示档案的完整信息，包括案件细节、人物关系等。</p>
+                                <p>玩家可以通过阅读这些档案获取线索，逐步解开案件谜题。</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            
+            // 登录功能
+            document.getElementById('login-btn').addEventListener('click', function() {
+                document.getElementById('auth-modal').classList.add('active');
+            });
+            
+            document.getElementById('modal-cancel-btn').addEventListener('click', function() {
+                document.getElementById('auth-modal').classList.remove('active');
+            });
+            
+            document.getElementById('modal-login-btn').addEventListener('click', function() {
+                const username = document.getElementById('username-input').value;
+                const password = document.getElementById('password-input').value;
+                
+                if (username === '王明远' && password === '20100520') {
+                    document.getElementById('user-info').textContent = '登录用户: 王科长 | 部门: 特殊事务科';
+                    document.getElementById('login-btn').style.display = 'none';
+                    document.getElementById('logout-btn').style.display = 'block';
+                    document.getElementById('auth-modal').classList.remove('active');
+                    alert('管理员登录成功！');
+                } else {
+                    document.getElementById('login-hint').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('login-hint').style.display = 'none';
+                    }, 3000);
+                }
+            });
+            
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                document.getElementById('user-info').textContent = '登录用户: 新进调查员 | 部门: 特殊事务科';
+                document.getElementById('login-btn').style.display = 'block';
+                this.style.display = 'none';
+            });
+            
+            // 推理提交
+            document.getElementById('submit-deduction').addEventListener('click', function() {
+                document.getElementById('deduction-form').classList.add('active');
+            });
+            
+            document.getElementById('final-submit').addEventListener('click', function() {
+                const culprit = document.getElementById('culprit-select').value;
+                const institute = document.getElementById('institute-select').value;
+                const relationship = document.getElementById('relationship-select').value;
+                
+                if (!culprit || !institute || !relationship) {
+                    alert('请完成所有选择！');
+                    return;
+                }
+                
+                alert(`您的推理已提交！\n凶手: ${culprit}\n研究所性质: ${institute}\n关系: ${relationship}`);
+            });
+            
+            // 进度条模拟
+            let progress = 0;
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            function updateProgress() {
+                progress += Math.random() * 5;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${Math.round(progress)}%`;
+                
+                if (progress < 100) {
+                    setTimeout(updateProgress, 1000);
+                }
+            }
+            
+            // 开始进度模拟
+            setTimeout(updateProgress, 1000);
+        });
+    </script>
+</body>
+</html>
